@@ -1,4 +1,4 @@
 **FAQ**: Um die Uhr auf dem Bildschirm verschieben zu können, klicken Sie mit der rechten Maustaste auf das Tray-Icon (1.) und deaktivieren "Hindurchklickbar" (2.).
 Anschließend können Sie die Uhr bzw. das Ziffernblatt mit der linken Maustaste anklicken, halten - und verschieben...
 
-**Download**: [https://www.ophthalmostar.de/freeware/#alarmclock](https://www.ophthalmostar.de/freeware/#netradio)
+**Download**: [https://www.ophthalmostar.de/freeware/#alarmclock](https://www.ophthalmostar.de/freeware/#alarmclock)
