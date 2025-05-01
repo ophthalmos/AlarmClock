@@ -1,4 +1,5 @@
-﻿using System.Drawing.Drawing2D;
+﻿using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Timers;
 using System.Xml;
 using System.Xml.Linq;
@@ -434,6 +435,7 @@ public partial class FrmClock : Form
         minutes2ToolStripMenuItem.Checked = false;
     }
 
+    // Fix for CS1656, CS1002, and CS1513 errors in the OnPaint method
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
@@ -517,10 +519,12 @@ public partial class FrmClock : Form
             }
             var rect = new Rectangle(rectX, rectY, rectWidth, 17);
             g.FillRectangle(Brushes.White, rect);
-            pen.Width = 0.5f;
-            pen.Color = Color.GreenYellow;
-            g.DrawRectangle(pen, rect);
-            g.DrawString(now.Day.ToString(), new Font(Font.FontFamily, 12, FontStyle.Bold), Brushes.DarkSeaGreen, rect, new StringFormat
+            using (var brush = new LinearGradientBrush(rect, Color.MediumAquamarine, Color.DarkCyan, LinearGradientMode.ForwardDiagonal))
+            {
+                g.DrawRectangle(new Pen(brush, 1), rect); // Zeichne den Rahmen des Rechtecks
+            }
+
+            g.DrawString(now.Day.ToString(), new Font(Font.FontFamily, 12, FontStyle.Regular), Brushes.DarkSlateGray, rect, new StringFormat
             {
                 LineAlignment = StringAlignment.Center,
                 Alignment = StringAlignment.Center
