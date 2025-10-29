@@ -33,8 +33,8 @@ partial class FrmClock
         notifyIcon = new NotifyIcon(components);
         contextMenuStrip = new ContextMenuStrip(components);
         autoStartToolStripMenuItem = new ToolStripMenuItem();
-        showCurrentDateToolStripMenuItem = new ToolStripMenuItem();
         showHideToolStripMenuItem = new ToolStripMenuItem();
+        showCurrentDateToolStripMenuItem = new ToolStripMenuItem();
         clicktroughToolStripMenuItem = new ToolStripMenuItem();
         toolStripSeparator1 = new ToolStripSeparator();
         eggTimerToolStripMenuItem = new ToolStripMenuItem();
@@ -52,6 +52,7 @@ partial class FrmClock
         alarmListeAnzeigenToolStripMenuItem = new ToolStripMenuItem();
         toolStripSeparator2 = new ToolStripSeparator();
         exitToolStripMenuItem = new ToolStripMenuItem();
+        showlargerToolStripMenuItem = new ToolStripMenuItem();
         contextMenuStrip.SuspendLayout();
         SuspendLayout();
         // 
@@ -65,9 +66,9 @@ partial class FrmClock
         // 
         // contextMenuStrip
         // 
-        contextMenuStrip.Items.AddRange(new ToolStripItem[] { autoStartToolStripMenuItem, showHideToolStripMenuItem, showCurrentDateToolStripMenuItem, clicktroughToolStripMenuItem, toolStripSeparator1, eggTimerToolStripMenuItem, toolStripSeparator3, alarmListeAnzeigenToolStripMenuItem, toolStripSeparator2, exitToolStripMenuItem });
+        contextMenuStrip.Items.AddRange(new ToolStripItem[] { autoStartToolStripMenuItem, showHideToolStripMenuItem, showlargerToolStripMenuItem, showCurrentDateToolStripMenuItem, clicktroughToolStripMenuItem, toolStripSeparator1, eggTimerToolStripMenuItem, toolStripSeparator3, alarmListeAnzeigenToolStripMenuItem, toolStripSeparator2, exitToolStripMenuItem });
         contextMenuStrip.Name = "contextMenuStrip";
-        contextMenuStrip.Size = new Size(192, 198);
+        contextMenuStrip.Size = new Size(192, 220);
         contextMenuStrip.Opening += ContextMenuStrip_Opening;
         // 
         // autoStartToolStripMenuItem
@@ -77,14 +78,6 @@ partial class FrmClock
         autoStartToolStripMenuItem.Text = "&AutoStart";
         autoStartToolStripMenuItem.Click += AutoStartToolStripMenuItem_Click;
         // 
-        // showDayMonthToolStripMenuItem
-        // 
-        showCurrentDateToolStripMenuItem.Font = new Font("Segoe UI", 9F);
-        showCurrentDateToolStripMenuItem.Name = "showDayMonthToolStripMenuItem";
-        showCurrentDateToolStripMenuItem.Size = new Size(191, 22);
-        showCurrentDateToolStripMenuItem.Text = "&Datum anzeigen";
-        showCurrentDateToolStripMenuItem.Click += ShowCurrentDateToolStripMenuItem_Click;
-        // 
         // showHideToolStripMenuItem
         // 
         showHideToolStripMenuItem.Font = new Font("Segoe UI", 9F);
@@ -92,6 +85,14 @@ partial class FrmClock
         showHideToolStripMenuItem.Size = new Size(191, 22);
         showHideToolStripMenuItem.Text = "Uhr &sichtbar";
         showHideToolStripMenuItem.Click += ShowHideToolStripMenuItem_Click;
+        // 
+        // showCurrentDateToolStripMenuItem
+        // 
+        showCurrentDateToolStripMenuItem.Font = new Font("Segoe UI", 9F);
+        showCurrentDateToolStripMenuItem.Name = "showCurrentDateToolStripMenuItem";
+        showCurrentDateToolStripMenuItem.Size = new Size(191, 22);
+        showCurrentDateToolStripMenuItem.Text = "&Datum anzeigen";
+        showCurrentDateToolStripMenuItem.Click += ShowCurrentDateToolStripMenuItem_Click;
         // 
         // clicktroughToolStripMenuItem
         // 
@@ -111,77 +112,77 @@ partial class FrmClock
         eggTimerToolStripMenuItem.Image = Properties.Resources.Reminder_16x;
         eggTimerToolStripMenuItem.Name = "eggTimerToolStripMenuItem";
         eggTimerToolStripMenuItem.Size = new Size(191, 22);
-        eggTimerToolStripMenuItem.Text = "&Erinnerungen…";
+        eggTimerToolStripMenuItem.Text = "&Erinnerungen";
         // 
         // minutes2ToolStripMenuItem
         // 
         minutes2ToolStripMenuItem.Name = "minutes2ToolStripMenuItem";
-        minutes2ToolStripMenuItem.Size = new Size(180, 22);
+        minutes2ToolStripMenuItem.Size = new Size(134, 22);
         minutes2ToolStripMenuItem.Text = "2 Minuten";
-        minutes2ToolStripMenuItem.Click += Minutes2ToolStripMenuItem_Click;
+        minutes2ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes3ToolStripMenuItem
         // 
         minutes3ToolStripMenuItem.Name = "minutes3ToolStripMenuItem";
-        minutes3ToolStripMenuItem.Size = new Size(180, 22);
+        minutes3ToolStripMenuItem.Size = new Size(134, 22);
         minutes3ToolStripMenuItem.Text = "3 Minuten";
-        minutes3ToolStripMenuItem.Click += Minutes3ToolStripMenuItem_Click;
+        minutes3ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes5ToolStripMenuItem
         // 
         minutes5ToolStripMenuItem.Name = "minutes5ToolStripMenuItem";
-        minutes5ToolStripMenuItem.Size = new Size(180, 22);
+        minutes5ToolStripMenuItem.Size = new Size(134, 22);
         minutes5ToolStripMenuItem.Text = "5 Minuten";
-        minutes5ToolStripMenuItem.Click += Minutes5ToolStripMenuItem_Click;
+        minutes5ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes10ToolStripMenuItem
         // 
         minutes10ToolStripMenuItem.Name = "minutes10ToolStripMenuItem";
-        minutes10ToolStripMenuItem.Size = new Size(180, 22);
+        minutes10ToolStripMenuItem.Size = new Size(134, 22);
         minutes10ToolStripMenuItem.Text = "10 Minuten";
-        minutes10ToolStripMenuItem.Click += Minutes10ToolStripMenuItem_Click;
+        minutes10ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes15ToolStripMenuItem
         // 
         minutes15ToolStripMenuItem.Name = "minutes15ToolStripMenuItem";
-        minutes15ToolStripMenuItem.Size = new Size(180, 22);
+        minutes15ToolStripMenuItem.Size = new Size(134, 22);
         minutes15ToolStripMenuItem.Text = "15 Minuten";
-        minutes15ToolStripMenuItem.Click += Minutes15ToolStripMenuItem_Click;
+        minutes15ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes20ToolStripMenuItem
         // 
         minutes20ToolStripMenuItem.Name = "minutes20ToolStripMenuItem";
-        minutes20ToolStripMenuItem.Size = new Size(180, 22);
+        minutes20ToolStripMenuItem.Size = new Size(134, 22);
         minutes20ToolStripMenuItem.Text = "20 Minuten";
-        minutes20ToolStripMenuItem.Click += Minutes20ToolStripMenuItem_Click;
+        minutes20ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes30ToolStripMenuItem
         // 
         minutes30ToolStripMenuItem.Name = "minutes30ToolStripMenuItem";
-        minutes30ToolStripMenuItem.Size = new Size(180, 22);
+        minutes30ToolStripMenuItem.Size = new Size(134, 22);
         minutes30ToolStripMenuItem.Text = "30 Minuten";
-        minutes30ToolStripMenuItem.Click += Minutes30ToolStripMenuItem_Click;
+        minutes30ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes45ToolStripMenuItem
         // 
         minutes45ToolStripMenuItem.Name = "minutes45ToolStripMenuItem";
-        minutes45ToolStripMenuItem.Size = new Size(180, 22);
+        minutes45ToolStripMenuItem.Size = new Size(134, 22);
         minutes45ToolStripMenuItem.Text = "45 Minuten";
-        minutes45ToolStripMenuItem.Click += Minutes45ToolStripMenuItem_Click;
+        minutes45ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes60ToolStripMenuItem
         // 
         minutes60ToolStripMenuItem.Name = "minutes60ToolStripMenuItem";
-        minutes60ToolStripMenuItem.Size = new Size(180, 22);
+        minutes60ToolStripMenuItem.Size = new Size(134, 22);
         minutes60ToolStripMenuItem.Text = "60 Minuten";
-        minutes60ToolStripMenuItem.Click += Minutes60ToolStripMenuItem_Click;
+        minutes60ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // minutes90ToolStripMenuItem
         // 
         minutes90ToolStripMenuItem.Name = "minutes90ToolStripMenuItem";
-        minutes90ToolStripMenuItem.Size = new Size(180, 22);
+        minutes90ToolStripMenuItem.Size = new Size(134, 22);
         minutes90ToolStripMenuItem.Text = "90 Minuten";
-        minutes90ToolStripMenuItem.Click += Minutes90ToolStripMenuItem_Click;
+        minutes90ToolStripMenuItem.Click += MinutesToolStripMenuItem_Click;
         // 
         // toolStripSeparator3
         // 
@@ -210,10 +211,16 @@ partial class FrmClock
         exitToolStripMenuItem.Text = "AlarmClock &beenden";
         exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
         // 
+        // showlargerToolStripMenuItem
+        // 
+        showlargerToolStripMenuItem.Name = "showlargerToolStripMenuItem";
+        showlargerToolStripMenuItem.Size = new Size(191, 22);
+        showlargerToolStripMenuItem.Text = "Uhr vergrößern";
+        showlargerToolStripMenuItem.Click += ShowlargerToolStripMenuItem_Click;
+        // 
         // FrmClock
         // 
-        AutoScaleDimensions = new SizeF(7F, 15F);
-        AutoScaleMode = AutoScaleMode.Font;
+        AutoScaleMode = AutoScaleMode.None;
         BackColor = Color.Gray;
         BackgroundImageLayout = ImageLayout.Stretch;
         ClientSize = new Size(132, 126);
@@ -259,4 +266,5 @@ partial class FrmClock
     private ToolStripMenuItem minutes3ToolStripMenuItem;
     private ToolStripMenuItem minutes2ToolStripMenuItem;
     private ToolStripMenuItem showCurrentDateToolStripMenuItem;
+    private ToolStripMenuItem showlargerToolStripMenuItem;
 }

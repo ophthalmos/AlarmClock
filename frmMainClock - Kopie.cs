@@ -23,7 +23,7 @@ public partial class FrmClock : Form
     private readonly int regularHeight;
     private bool showCurrentDate = true;
     private int inflateSize = 200;
-    private readonly double scaleFactor = 1.25;
+    private readonly double scaleFactor = 1.20;
     private int listSelection = 0; // für die ListView-Position
     private string hotkeyLetter = "H"; // für den Hotkey-Handler    
     private int letzteSekunde = -1;
@@ -35,7 +35,6 @@ public partial class FrmClock : Form
     private bool bar = false; // für den Hotkey-Handler 
     private AlarmList? frmAlarmList;
     private Point msgLocation = new(0, 0); // new Point(Screen.PrimaryScreen.WorkingArea.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2);
-    private readonly Dictionary<ToolStripMenuItem, CancellationTokenSource> cancellationTokenSources = [];
 
     public FrmClock()
     {
@@ -381,36 +380,16 @@ public partial class FrmClock : Form
 
     private async void MinutesToolStripMenuItem_Click(object sender, EventArgs e)
     {
-        var menuItem = (ToolStripMenuItem)sender;
-        if (menuItem.Checked)
-        {
-            if (cancellationTokenSources.TryGetValue(menuItem, out var cts))
-            {
-                cts.Cancel(); // Signal zum Abbrechen senden
-                cancellationTokenSources.Remove(menuItem); // Aufräumen
-            }
-            menuItem.Checked = false;
-            return;
-        }
+        ToolStripMenuItem menuItem = (ToolStripMenuItem)sender;
         if (menuItem.Tag is int minutes)
         {
-            if (cancellationTokenSources.ContainsKey(menuItem)) { return; }  // Sollte normalerweise nicht passieren, wenn der UnCheck-Teil korrekt läuft
-            var cts = new CancellationTokenSource();
-            cancellationTokenSources[menuItem] = cts;
             menuItem.Checked = true;
-            try
-            {
-                await Task.Delay(TimeSpan.FromMinutes(minutes), cts.Token);
-                Utilities.ShowReminderForm(msgLocation, minutes);
-            }
-            catch (TaskCanceledException) { } // Wird ausgelöst, wenn cts.Cancel() aufgerufen wird. Also erwartet. Keine weitere Aktion erforderlich.
-            finally
-            {
-                if (menuItem.Checked) { menuItem.Checked = false; }
-                cancellationTokenSources.Remove(menuItem);
-            }
+            await Task.Delay(TimeSpan.FromMinutes(minutes));
+            Utilities.ShowReminderForm(msgLocation, minutes);
+            menuItem.Checked = false;
         }
     }
+
     protected override CreateParams CreateParams  // damit das Fenster nicht in der Alt-Tab-Liste erscheint
     {
         get
@@ -474,25 +453,56 @@ public partial class FrmClock : Form
 
         if (showCurrentDate)
         {
-            var currentScale = showLarger ? scaleFactor : 1.0;
-            var rectWidth = 26; // (int)(26 * currentScale);
-            var rectHeight = 17; // (int)(18 * currentScale);
-            var rectDistance = radius * 0.35; // Abstand vom Zentrum, wo das Rechteck erscheinen soll
-            var fontSize = 12f; // (float)(12 * currentScale);
-            var freeQuadrant = Utilities.FindFreestQuadrant(minEndPoint, hourEndPoint, centerPoint);
-            var angle = freeQuadrant switch // Winkel für die Platzierung
+            var rectWidth = 26; // Breite des Rectangle
+            var rectX = centerPoint.X - rectWidth / 2;
+            var rectY = 32;
+            var (qRight, qObliq) = Utilities.GetCoveredQuadrants(centerPoint, minEndPoint, hourEndPoint); // Arrays mit 4 bool-Werten (für jedes Viertel)
+            if (!qRight[0] && !qRight[1]) // Zeiger in unterer Hälfte
             {
-                Utilities.Quadrant.Top => -Math.PI / 2,
-                Utilities.Quadrant.Bottom => Math.PI / 2,
-                Utilities.Quadrant.Left => Math.PI,
-                Utilities.Quadrant.Right => 0,
-                _ => -Math.PI / 2,
-            };
-            var rectCenterX = (int)(centerPoint.X + rectDistance * Math.Cos(angle)); // Mittelpunkt des Rechtecks
-            var rectCenterY = (int)(centerPoint.Y + rectDistance * Math.Sin(angle));
-            var rect = new Rectangle(rectCenterX - rectWidth / 2, rectCenterY - rectHeight / 2, rectWidth, rectHeight); // Endgültiges Rechteck
+                rectX = centerPoint.X - rectWidth / 2;
+                rectY = 32;
+            }
+            else if (!qRight[2] && !qRight[3]) // Zeiger in oberer Hälfte
+            {
+                rectX = centerPoint.X - rectWidth / 2;
+                rectY = centerPoint.Y + (showLarger ? 22 : 14);
+            }
+            else if (!qRight[1] && !qRight[2]) // Zeiger in linker Hälfte
+            {
+                rectX = centerPoint.X + (showLarger ? 18 : 10);
+                rectY = centerPoint.Y - 8;
+            }
+            else if (!qRight[0] && !qRight[3]) // Zeiger in rechter Hälfte
+            {
+                rectX = centerPoint.X - 38;
+                rectY = centerPoint.Y - 6;
+            }
+            else if (!qObliq[0]) // oben
+            {
+                rectX = centerPoint.X - rectWidth / 2;
+                rectY = showLarger ? 40 : 32;
+            }
+            else if (!qObliq[2]) // unten
+            {
+                rectX = centerPoint.X - rectWidth / 2;
+                rectY = 76;
+            }
+            else if (!qObliq[3]) // rechts
+            {
+                rectX = centerPoint.X + 10;
+                rectY = centerPoint.Y - 6;
+            }
+            else if (!qObliq[1]) // links
+            {
+                rectX = centerPoint.X - 38;
+                rectY = centerPoint.Y - 6;
+            }
+            var rect = new Rectangle(rectX, rectY, rectWidth, 17);
             g.FillRectangle(Brushes.White, rect);
-            using (var brush = new LinearGradientBrush(rect, Color.LightSlateGray, Color.SlateGray, LinearGradientMode.ForwardDiagonal)) { g.DrawRectangle(new Pen(brush, 1), rect); }  // Zeichne den Rahmen des Rechtecks
+            using (var brush = new LinearGradientBrush(rect, Color.LightSlateGray, Color.SlateGray, LinearGradientMode.ForwardDiagonal)) //Color.MediumAquamarine, Color.DarkCyan
+            {
+                g.DrawRectangle(new Pen(brush, 1), rect); // Zeichne den Rahmen des Rechtecks
+            }
             rect.Y += 1; // Verschiebe das Rechteck um 1 Pixel nach unten
             rect.X += 1;
             rect.Width -= 2;
@@ -502,8 +512,11 @@ public partial class FrmClock : Form
                 g.DrawRectangle(new Pen(brush, 1), rect); // Zeichne den Rahmen des Rechtecks
             }
             rect.Y += 1; // Verschiebe das Rechteck um 1 Pixel nach unten
-            using var dateFont = new Font(Font.FontFamily, fontSize, FontStyle.Regular);
-            g.DrawString(now.Day.ToString(), dateFont, Brushes.DarkSlateGray, rect, new StringFormat { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center });
+            g.DrawString(now.Day.ToString(), new Font(Font.FontFamily, 12, FontStyle.Regular), Brushes.DarkSlateGray, rect, new StringFormat
+            {
+                LineAlignment = StringAlignment.Center,
+                Alignment = StringAlignment.Center
+            });
         }
         pen.Color = Color.Black;
         pen.Width = 3f;
