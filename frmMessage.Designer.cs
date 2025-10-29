@@ -122,7 +122,6 @@ partial class MessageForm
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.Manual;
         Text = "AlarmClock";
-        TopMost = true;
         panel.ResumeLayout(false);
         panel.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();

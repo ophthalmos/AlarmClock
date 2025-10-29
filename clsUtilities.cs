@@ -5,6 +5,7 @@ using System.Media;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
+using System.Linq;
 
 namespace AlarmClock;
 internal static class Utilities
@@ -66,7 +67,7 @@ internal static class Utilities
         else { return reminder.Datetime.AddYears(jetzt.Year - reminder.Datetime.Year + 1); }
     }
 
-    internal static void ShowReminderForm(Point location, int delayTime)
+    internal static void ShowReminderForm(Point location, int delayTime) // ShowReminderForm wird von Minutenmenü in FrmClock aufgerufen
     {
         PlaySound("warning.wav");
         var heading = "Erinnerung (" + DateTime.Now.ToLongTimeString() + ")";
@@ -74,14 +75,13 @@ internal static class Utilities
         var frm = new MessageForm(location, heading, text, "", false);
         frm.FormClosed += (sender, e) =>
         {
-            if (Application.OpenForms[0] is not null and FrmClock frmClock) { frmClock.MsgLocation = frm.Location; }
+            if (Application.OpenForms[0] is not null and FrmClock frmClock) { frmClock.SetMsgLocation(frm.Location); }
         };
-        var activeWindow = NativeMethods.GetForegroundWindow();
         NativeMethods.ShowWindow(frm.Handle, NativeMethods.SW_SHOWNOACTIVATE); // frm.Show();
-        if (!NativeMethods.IsTopMost(activeWindow)) { NativeMethods.SetForegroundWindow(activeWindow); }
+        NativeMethods.SetWindowPos(frm.Handle, NativeMethods.HWND_TOPMOST, 0, 0, 0, 0, NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOACTIVATE | NativeMethods.SWP_SHOWWINDOW);
     }
 
-    private static void ShowMessageForm(Form? caller, Point? location, Reminder reminder, int remIndex)
+    private static void ShowMessageForm(Form? caller, Point? location, Reminder reminder, int remIndex) // ShowMessageForm wird nur von ShowReminder aufgerufen
     {
         PlaySound("warning.wav");
         var repeatText = repeatList[reminder.Repeat];
@@ -92,7 +92,7 @@ internal static class Utilities
         {
             using var frm = new MessageForm(location, heading, text, repeatText, check);
             frm.Width = Math.Max(frm.Width, TextRenderer.MeasureText(heading, frm.HeadingFont()).Width + 90);
-            if (frm.ShowDialog() == DialogResult.OK) { alarmList.GetListView.SelectedItems[0].Checked = frm.CheckBoxChecked(); }
+            if (frm.ShowDialog() == DialogResult.OK) { alarmList.GetListView().SelectedItems[0].Checked = frm.CheckBoxChecked(); }
         }
         else
         {
@@ -102,21 +102,17 @@ internal static class Utilities
             {
                 if (caller is not null and FrmClock frmClock) //if (Application.OpenForms[0] is not null and FrmClock frmClock)
                 {
-                    frmClock.GetReminderList[remIndex].Check = frm.CheckBoxChecked();
-                    frmClock.MsgLocation = frm.Location;
+                    frmClock.GetReminderList()[remIndex].Check = frm.CheckBoxChecked();
+                    frmClock.SetMsgLocation(frm.Location);
                 }
             };
-            var activeWindow = NativeMethods.GetForegroundWindow();
             NativeMethods.ShowWindow(frm.Handle, NativeMethods.SW_SHOWNOACTIVATE); // frm.Show();
-            if (!NativeMethods.IsTopMost(activeWindow)) { NativeMethods.SetForegroundWindow(activeWindow); }
+            NativeMethods.SetWindowPos(frm.Handle, NativeMethods.HWND_TOPMOST, 0, 0, 0, 0, NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOACTIVATE | NativeMethods.SWP_SHOWWINDOW);
         }
     }
 
     internal static bool TaskDialogYesNo(IntPtr hwnd, string caption, string heading, string text)
     {
-        //if (hwnd == IntPtr.Zero) { return MessageBox.Show(heading + Environment.NewLine + text, caption, MessageBoxButtons.YesNo) == DialogResult.Yes; }
-        //else
-        //{
         using TaskDialogIcon questionDialogIcon = new(Properties.Resources.Question_32x);
         var page = new TaskDialogPage
         {
@@ -196,18 +192,18 @@ internal static class Utilities
         catch (Exception ex) { ErrorMsgTaskDlg(IntPtr.Zero, ex.GetType().ToString(), ex.Message); }
     }
 
-    public static (bool[] right, bool[] obliq) GetCoveredQuadrants(Point center, Point minuteHand, Point hourHand)
-    {
-        var minuteAngle = CalculateAngle(center, minuteHand);
-        var hourAngle = CalculateAngle(center, hourHand);
-        var quadUpright = new bool[4]; // Index 0: linksoben, 1: rechtsoben, 2: rechtsunten, 3: linksunten
-        var quadOblique = new bool[4]; // Index 0: oben, 1: rechts, 2: unten, 3: links
-        quadUpright[GetUpright(minuteAngle)] = true;
-        quadUpright[GetUpright(hourAngle)] = true;
-        quadOblique[GetOblique(minuteAngle)] = true;
-        quadOblique[GetOblique(hourAngle)] = true;
-        return (quadUpright, quadOblique);
-    }
+    //public static (bool[] right, bool[] obliq) GetCoveredQuadrants(Point center, Point minuteHand, Point hourHand)
+    //{
+    //    var minuteAngle = CalculateAngle(center, minuteHand);
+    //    var hourAngle = CalculateAngle(center, hourHand);
+    //    var quadUpright = new bool[4]; // Index 0: linksoben, 1: rechtsoben, 2: rechtsunten, 3: linksunten
+    //    var quadOblique = new bool[4]; // Index 0: oben, 1: rechts, 2: unten, 3: links
+    //    quadUpright[GetUpright(minuteAngle)] = true;
+    //    quadUpright[GetUpright(hourAngle)] = true;
+    //    quadOblique[GetOblique(minuteAngle)] = true;
+    //    quadOblique[GetOblique(hourAngle)] = true;
+    //    return (quadUpright, quadOblique);
+    //}
 
     private static double CalculateAngle(Point center, Point end)
     {
@@ -247,7 +243,7 @@ internal static class Utilities
         //else { return assemblyLocation.Equals(RemoveFromEnd(value.Trim('"'), "\\unins000.exe")); } // "C:\Program Files\AlarmClock\unins000.exe"
     }
 
-    private static string RemoveFromEnd(string str, string toRemove) => str.EndsWith(toRemove) ? str[..^toRemove.Length] : str;
+    //private static string RemoveFromEnd(string str, string toRemove) => str.EndsWith(toRemove) ? str[..^toRemove.Length] : str;
 
 
     //private static int GetStringLengthPx(string text, Font font)
@@ -265,10 +261,7 @@ internal static class Utilities
 
     public static int GetIndexOfFirstEmptyRow(ListView listView)
     {
-        for (var i = 0; i < listView.Items.Count; i++)
-        {
-            if (string.IsNullOrEmpty(listView.Items[i].Text)) { return i; }
-        }
+        for (var i = 0; i < listView.Items.Count; i++) { if (string.IsNullOrEmpty(listView.Items[i].Text)) { return i; } }
         return -1; // Keine leere Zeile gefunden
     }
 
@@ -281,15 +274,8 @@ internal static class Utilities
     public static bool IsAutoStartEnabled(string appName, string assemblyLocation)
     {
         using var key = Registry.CurrentUser.OpenSubKey(runLocation);
-        if (key == null)
-        {
-            return false;
-        }
-
-        if (key.GetValue(appName) is not string value)
-        {
-            return false;
-        }
+        if (key == null) { return false; }
+        if (key.GetValue(appName) is not string value) { return false; }
         else if (Debugger.IsAttached) { return true; } // run by Visual Studio
         else { return value == assemblyLocation; }
     }
@@ -368,38 +354,30 @@ internal static class Utilities
         catch (Exception ex) when (ex is Win32Exception || ex is InvalidOperationException) { ErrorMsgTaskDlg(IntPtr.Zero, ex.GetType().ToString(), ex.Message); }
     }
 
-    public static bool EqualsWithTolerance(this DateTime dateTime1, DateTime dateTime2, TimeSpan tolerance)
-    {
-        var difference = dateTime1 - dateTime2;
-        if (difference < TimeSpan.Zero) { difference = -difference; }
-        return difference <= tolerance;
-    }
+    //public static bool EqualsWithTolerance(this DateTime dateTime1, DateTime dateTime2, TimeSpan tolerance)
+    //{
+    //    var difference = dateTime1 - dateTime2;
+    //    if (difference < TimeSpan.Zero) { difference = -difference; }
+    //    return difference <= tolerance;
+    //}
 
-    public static bool UhrzeitenSindGleich(this DateTime zeit1, DateTime zeit2, TimeSpan toleranz)
-    {
-        return zeit1.TimeOfDay.Subtract(zeit2.TimeOfDay).Duration() <= toleranz;
-    }
+    //public static bool UhrzeitenSindGleich(this DateTime zeit1, DateTime zeit2, TimeSpan toleranz) => zeit1.TimeOfDay.Subtract(zeit2.TimeOfDay).Duration() <= toleranz;
 
-    public static DateTime ConvertStringToDate(string dateString)
-    {
-        var day = int.Parse(dateString[..2]);
-        var month = int.Parse(dateString.Substring(2, 2));
-        var year = int.Parse(dateString.Substring(4, 4));
-        return new DateTime(year, month, day);
-    }
+    //public static DateTime ConvertStringToDate(string dateString)
+    //{
+    //    var day = int.Parse(dateString[..2]);
+    //    var month = int.Parse(dateString.Substring(2, 2));
+    //    var year = int.Parse(dateString.Substring(4, 4));
+    //    return new DateTime(year, month, day);
+    //}
 
     public static DateTime ConvertStringToDateTime(string dateString)
     {
         if (dateString.Length != 14)
         {
-            //var mainForm = Application.OpenForms.Cast<Form>().FirstOrDefault();
-            //if (mainForm != null)
-            //{
             ErrorMsgTaskDlg(IntPtr.Zero, "Error", "ConvertString to short" + Environment.NewLine + dateString);
-            //}
             throw new ArgumentException("Das Datumsformat muss ddMMyyyyHHmmss sein.", nameof(dateString));
         }
-
         var day = int.Parse(dateString[..2]);
         var month = int.Parse(dateString.Substring(2, 2));
         var year = int.Parse(dateString.Substring(4, 4));
@@ -409,21 +387,19 @@ internal static class Utilities
         return new DateTime(year, month, day, hour, minute, second);
     }
 
-
     internal static (Point, Point) CalculateSecondPoint(int seconds, int radius, Point center)
     {
         var overlapRatio = 0.2f;
-        var angle = (Math.PI / 30 * seconds) - Math.PI / 2;
-        var endX = (int)(center.X + (radius * Math.Cos(angle)));
-        var endY = (int)(center.Y + (radius * Math.Sin(angle)));
-        var startX = (int)(center.X - (radius * overlapRatio * Math.Cos(angle)));
-        var startY = (int)(center.Y - (radius * overlapRatio * Math.Sin(angle)));
+        var angle = (seconds * 6) * Math.PI / 180; // Oder (Math.PI / 30 * seconds); 6 Grad pro Sekunde
+        var endX = (int)(center.X + (radius * Math.Sin(angle)));
+        var endY = (int)(center.Y - (radius * Math.Cos(angle)));
+        var startX = (int)(center.X - (radius * overlapRatio * Math.Sin(angle))); // Overlap in entgegengesetzte Richtung
+        var startY = (int)(center.Y + (radius * overlapRatio * Math.Cos(angle)));
         return (new Point(startX, startY), new Point(endX, endY));
     }
 
     internal static Point CalculateMinutePoint(int minute, int radius, Point center)
     {
-
         var bogenmass = minute * 6 * Math.PI / 180;
         var x = center.X + (int)(radius * Math.Sin(bogenmass));
         var y = center.Y - (int)(radius * Math.Cos(bogenmass));
@@ -432,10 +408,36 @@ internal static class Utilities
 
     internal static Point CalculateHourPoint(int hour, int minute, int radius, Point center)
     {
-
         var hourAngleRadians = (double)((hour + (minute / 60.0)) * 30) * Math.PI / 180;
         var x = center.X + (int)(radius * Math.Sin(hourAngleRadians));
         var y = center.Y - (int)(radius * Math.Cos(hourAngleRadians));
         return new Point(x, y);
+    }
+
+    public enum Quadrant
+    {
+        Top, Bottom, Left, Right
+    }
+
+    public static double GetAngularDifference(double angle1, double angle2) // Berechnet die kleinste absolute Winkeldifferenz zwischen zwei Winkeln in Bogenmaß.
+    {
+        var diff = Math.Abs(angle1 - angle2);
+        return Math.Min(diff, (2 * Math.PI) - diff);  // Wähle den kürzeren Weg (z.B. ist der Abstand zwischen 350° und 10° nicht 340°, sondern 20°)
+    }
+
+    public static Quadrant FindFreestQuadrant(Point minuteEnd, Point hourEnd, Point center)
+    {
+        var minAngle = Math.Atan2(minuteEnd.Y - center.Y, minuteEnd.X - center.X); // Winkel der Zeiger berechnen
+        var hourAngle = Math.Atan2(hourEnd.Y - center.Y, hourEnd.X - center.X);
+        var placementAngles = new Dictionary<Quadrant, double> { { Quadrant.Right, 0 }, { Quadrant.Bottom, Math.PI / 2 }, { Quadrant.Left, Math.PI }, { Quadrant.Top, -Math.PI / 2 } };
+        var quadrantScores = new Dictionary<Quadrant, double>(); // Score ist der *minimale* Abstand, den dieser Platz zu *irgendeinem* Zeiger hat.
+        foreach (var placement in placementAngles)
+        {
+            var targetAngle = placement.Value;
+            var distToMin = GetAngularDifference(targetAngle, minAngle);      // Finde den Abstand dieses Platzes zu beiden Zeigern
+            var distToHour = GetAngularDifference(targetAngle, hourAngle);    // Finde den Abstand dieses Platzes zu beiden Zeigern
+            quadrantScores[placement.Key] = Math.Min(distToMin, distToHour);  // Der "Sicherheits-Score" dieses Platzes ist der Abstand zum NÄCHSTEN Zeiger.
+        }
+        return (new[] { Quadrant.Right, Quadrant.Bottom, Quadrant.Left, Quadrant.Top }).OrderByDescending(q => quadrantScores[q]).First(); // Preferred order if tie   
     }
 }

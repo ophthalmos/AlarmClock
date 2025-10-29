@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -10,14 +10,19 @@
     <Platforms>AnyCPU;x64</Platforms>
     <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</SourceRevisionId>
     <NoWarn>1701;1702;SYSLIB1054;SYSLIB1045</NoWarn>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.1.3</AssemblyVersion>
+    <FileVersion>1.0.1.3</FileVersion>
+    <NeutralLanguage>de</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Papierkorb\**" />
     <EmbeddedResource Remove="Papierkorb\**" />
     <None Remove="Papierkorb\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="frmMainClock - Kopie.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,7 +58,11 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="REM xcopy &quot;$(TargetPath)&quot; &quot;C:\Tools\Ophthalmostar\&quot; /y&#xD;&#xA;REM xcopy &quot;$(TargetDir)\*.exe&quot; &quot;C:\Tools\Ophthalmostar\&quot; /y" />
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;C:\Program Files\$(AssemblyName)\&quot; /y&#xD;&#xA;xcopy &quot;$(TargetDir)\*.exe&quot; &quot;C:\Program Files\$(AssemblyName)\&quot; /y" />
+  </Target>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="powershell -Command &quot;if (Get-Process -Name '$(AssemblyName)' -ErrorAction SilentlyContinue) { Stop-Process -Name '$(AssemblyName)' -Force }&quot;" />
   </Target>
 
 </Project>

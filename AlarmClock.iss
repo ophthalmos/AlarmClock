@@ -1,5 +1,5 @@
 #define MyAppName "AlarmClock"
-#define MyAppVersion "1.0.0.0"
+#define MyAppVersion "1.0.1.3"
 
 [Setup]
 AppName={#MyAppName}
@@ -37,11 +37,11 @@ MinVersion=0,10.0
 Name: "German"; MessagesFile: "compiler:Languages\German.isl"
 
 [Files]
-Source: "bin\x64\Release\net8.0-windows\AlarmClock.exe"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
-Source: "bin\x64\Release\net8.0-windows\{#MyAppName}.dll"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
-Source: "bin\x64\Release\net8.0-windows\warning.wav"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
-Source: "bin\x64\Release\net8.0-windows\reminder.wav"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
-Source: "bin\x64\Release\net8.0-windows\{#MyAppName}.runtimeconfig.json"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
+Source: "bin\x64\Release\net8.0-windows7.0\AlarmClock.exe"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
+Source: "bin\x64\Release\net8.0-windows7.0\{#MyAppName}.dll"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
+Source: "bin\x64\Release\net8.0-windows7.0\warning.wav"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
+Source: "bin\x64\Release\net8.0-windows7.0\reminder.wav"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
+Source: "bin\x64\Release\net8.0-windows7.0\{#MyAppName}.runtimeconfig.json"; DestDir: "{app}"; Permissions: users-modify; Flags: ignoreversion
 Source: "Lizenzvereinbarung.txt"; DestDir: "{app}"; Permissions: users-modify;
 
 [Icons]
@@ -116,5 +116,5 @@ begin
   StaticText.Left := WizardForm.FinishedLabel.Left;
   StaticText.Top := WizardForm.FinishedLabel.Top + 120;
   StaticText.Font.Style := [fsBold];
-  StaticText.Caption := 'Als besonderes Feature ist die angezeigte Uhr'#13'hindurchklickbar. Um die Uhr auf die gewünschte'#13'Position verschieben zu können, müssen sie'#13'"Hindurchklickbar" vorübergehend abstellen.'#13'Das gelingt duurch einen Klick mit der rechten'#13'Maustaste auf das TrayIcon im Infobereich.'#13''#13'Nota bene: Strg+Win+J und Shift+Strg+Win+J';
+  StaticText.Caption := 'Als besonderes Feature ist die angezeigte Uhr'#13'hindurchklickbar. Um die Uhr auf die gewünschte'#13'Position verschieben zu können, müssen sie'#13'"Hindurchklickbar" vorübergehend abstellen.'#13'Das gelingt durch einen Klick mit der rechten'#13'Maustaste auf das TrayIcon im Infobereich.';
 end;

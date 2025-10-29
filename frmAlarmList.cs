@@ -4,12 +4,7 @@ public partial class AlarmList : Form
 
     public List<Reminder> GetReminders() => reminders;
     public int GetSelectedIndex() => listView.SelectedIndices.Count > 0 ? listView.SelectedIndices[0] : -1;
-
-    public ListView GetListView
-    {
-        get => listView; set => listView = value;
-    }
-
+    public ListView GetListView() => listView;
 
     private readonly List<Reminder> reminders;
     private bool checkLVDoubleClick = false;
@@ -311,7 +306,7 @@ public partial class AlarmList : Form
         //var point = listView.PointToClient(new Point(e.X, e.Y));
         //var targetItem = listView.GetItemAt(point.X, point.Y);
 
-        int targetIndex = listView.InsertionMark.Index;
+        var targetIndex = listView.InsertionMark.Index;
         //if (targetIndex == -1) { return; }  // If the insertion mark is not visible, exit the method.
         //if (listView.InsertionMark.AppearsAfterItem) { targetIndex++; } // If the insertion mark is to the right of the item with the corresponding index, increment the target index.
         var targetItem = listView.Items[targetIndex];
